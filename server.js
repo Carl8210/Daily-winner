@@ -12,16 +12,21 @@ app.use(express.static('public'));
 const names = require('./names.json');
 const winnersFile = path.join(__dirname, 'winner.json');
 
-function pickRandomWinner() {
-  const winner = names[Math.floor(Math.random() * names.length)];
+function pickWinners() {
+  const shuffled = names.sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 5);
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Berlin' });
-  const dailyWinner = { name: winner, date: today };
-  fs.writeFileSync(winnersFile, JSON.stringify(dailyWinner, null, 2));
-  return dailyWinner;
+  const dailyResult = {
+    date: today,
+    winner: selected[0],
+    runnersUp: selected.slice(1)
+  };
+  fs.writeFileSync(winnersFile, JSON.stringify(dailyResult, null, 2));
+  return dailyResult;
 }
 
 cron.schedule('0 4 * * *', () => {
-  pickRandomWinner();
+  pickWinners();
 }, {
   timezone: "Europe/Berlin"
 });
@@ -37,12 +42,12 @@ app.get('/winner', (req, res) => {
     if (data.date === today) {
       res.json(data);
     } else {
-      const newWinner = pickRandomWinner();
-      res.json(newWinner);
+      const newData = pickWinners();
+      res.json(newData);
     }
   } catch {
-    const newWinner = pickRandomWinner();
-    res.json(newWinner);
+    const newData = pickWinners();
+    res.json(newData);
   }
 });
 

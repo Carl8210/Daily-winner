@@ -5,16 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daily Winner</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .winner { font-size: 1.5em; color: green; margin-bottom: 20px; }
-    ul { columns: 2; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      color: white;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .winner {
+      font-size: 2em;
+      font-weight: bold;
+      color: gold;
+    }
+    .runner-up {
+      font-size: 1.2em;
+      color: lightgray;
+    }
+    ul {
+      columns: 2;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <h1>Today's Winner</h1>
   <div class="winner" id="winner">Loading...</div>
-  <h2>Name List</h2>
+  <h2>Runners-Up</h2>
+  <ul id="runners-up"></ul>
+  <h2>All Names</h2>
   <ul id="name-list"></ul>
+
   <script>
     async function fetchData() {
       const [namesRes, winnerRes] = await Promise.all([
@@ -22,13 +42,22 @@
         fetch('/winner')
       ]);
       const names = await namesRes.json();
-      const winner = await winnerRes.json();
-      document.getElementById('winner').textContent = winner.name;
-      const list = document.getElementById('name-list');
+      const result = await winnerRes.json();
+
+      document.getElementById('winner').textContent = result.winner;
+      const runnerList = document.getElementById('runners-up');
+      result.runnersUp.forEach(name => {
+        const li = document.createElement('li');
+        li.className = 'runner-up';
+        li.textContent = name;
+        runnerList.appendChild(li);
+      });
+
+      const nameList = document.getElementById('name-list');
       names.forEach(name => {
         const li = document.createElement('li');
         li.textContent = name;
-        list.appendChild(li);
+        nameList.appendChild(li);
       });
     }
     fetchData();
