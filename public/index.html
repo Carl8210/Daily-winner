@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Winner</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .winner { font-size: 1.5em; color: green; margin-bottom: 20px; }
+    ul { columns: 2; }
+  </style>
+</head>
+<body>
+  <h1>Today's Winner</h1>
+  <div class="winner" id="winner">Loading...</div>
+  <h2>Name List</h2>
+  <ul id="name-list"></ul>
+  <script>
+    async function fetchData() {
+      const [namesRes, winnerRes] = await Promise.all([
+        fetch('/names'),
+        fetch('/winner')
+      ]);
+      const names = await namesRes.json();
+      const winner = await winnerRes.json();
+      document.getElementById('winner').textContent = winner.name;
+      const list = document.getElementById('name-list');
+      names.forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        list.appendChild(li);
+      });
+    }
+    fetchData();
+  </script>
+</body>
+</html>
