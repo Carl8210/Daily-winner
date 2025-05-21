@@ -3,17 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
 const cors = require('cors');
-const app = express();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const names = require('./names.json');
+const PASSWORD = "phxtrain";
+const namesFile = path.join(__dirname, 'names.json');
 const winnersFile = path.join(__dirname, 'winner.json');
 
+let names = require('./names.json');
+
 function pickWinners() {
-  const shuffled = names.sort(() => 0.5 - Math.random());
+  const shuffled = [...names].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 5);
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Berlin' });
   const dailyResult = {
@@ -51,11 +54,6 @@ app.get('/winner', (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-const PASSWORD = "phxtrain";
-
 app.post('/edit-names', (req, res) => {
   const { password, names: newNames } = req.body;
 
@@ -68,6 +66,9 @@ app.post('/edit-names', (req, res) => {
   }
 
   names = newNames;
-  fs.writeFileSync(path.join(__dirname, 'names.json'), JSON.stringify(names, null, 2));
+  fs.writeFileSync(namesFile, JSON.stringify(names, null, 2));
   res.json({ success: true });
 });
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
