@@ -54,14 +54,19 @@ app.get('/winner', (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+const PASSWORD = "phxtrain";
+
 app.post('/edit-names', (req, res) => {
   const { password, names: newNames } = req.body;
-  if (password !== "phxtrain") {
+
+  if (password !== PASSWORD) {
     return res.status(403).json({ error: "Incorrect password" });
   }
+
   if (!Array.isArray(newNames) || !newNames.every(n => typeof n === 'string')) {
     return res.status(400).json({ error: "Invalid names format" });
   }
+
   names = newNames;
   fs.writeFileSync(path.join(__dirname, 'names.json'), JSON.stringify(names, null, 2));
   res.json({ success: true });
