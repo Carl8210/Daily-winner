@@ -11,15 +11,26 @@
       color: black;
       background: url('background.jpg') no-repeat center center fixed;
       background-size: cover;
+      position: relative;
     }
-    .winner {
+    .conductor {
       font-size: 2em;
       font-weight: bold;
-      color: darkblue;
+      color: limegreen;
     }
     .runner-up {
       font-size: 1.2em;
-      color: darkred;
+      color: white;
+    }
+    .name-list li {
+      color: orange;
+    }
+    .countdown {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: orange;
+      font-weight: bold;
     }
     ul {
       columns: 2;
@@ -28,12 +39,13 @@
   </style>
 </head>
 <body>
-  <h1>Today's Winner</h1>
-  <div class="winner" id="winner">Loading...</div>
+  <div class="countdown" id="countdown">Next draw in: --:--:--</div>
+  <h1>Today's Train Conductor</h1>
+  <div class="conductor" id="winner">Loading...</div>
   <h2>Runners-Up</h2>
   <ul id="runners-up"></ul>
   <h2>All Names</h2>
-  <ul id="name-list"></ul>
+  <ul id="name-list" class="name-list"></ul>
 
   <script>
     async function fetchData() {
@@ -46,10 +58,10 @@
 
       document.getElementById('winner').textContent = result.winner;
       const runnerList = document.getElementById('runners-up');
-      result.runnersUp.forEach(name => {
+      result.runnersUp.forEach((name, index) => {
         const li = document.createElement('li');
         li.className = 'runner-up';
-        li.textContent = name;
+        li.textContent = `${index + 2}. ${name}`;
         runnerList.appendChild(li);
       });
 
@@ -60,7 +72,24 @@
         nameList.appendChild(li);
       });
     }
+
+    function updateCountdown() {
+      const now = new Date();
+      const target = new Date();
+      target.setHours(6, 0, 0, 0);
+      if (now >= target) {
+        target.setDate(target.getDate() + 1);
+      }
+      const diff = target - now;
+      const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+      const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+      const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+      document.getElementById('countdown').textContent = `Next draw in: ${hours}:${minutes}:${seconds}`;
+    }
+
     fetchData();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
   </script>
 </body>
 </html>
