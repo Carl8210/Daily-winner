@@ -36,7 +36,7 @@
 
     .runner-up-title {
       text-decoration: underline;
-      color: darkblue;
+      color: red;
     }
 
     .runner-up {
@@ -46,6 +46,10 @@
 
     .name-list li {
       color: orange;
+    }
+
+    .member-title {
+      color: red;
     }
 
     .countdown {
@@ -68,11 +72,11 @@
   <div class="stroke conductor" id="winner">Loading...</div>
   <h2 class="stroke runner-up-title">Runners-Up</h2>
   <ul id="runners-up"></ul>
-  <h2 class="stroke">All Names</h2>
+  <h2 class="stroke member-title">Current Members</h2>
   <ul id="name-list" class="name-list"></ul>
 
   <script>
-    // Format and display today's date in the heading
+    // Display today's date
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('today-heading').textContent += " - " + today.toLocaleDateString(undefined, options);
