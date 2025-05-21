@@ -13,18 +13,41 @@
       background-size: cover;
       position: relative;
     }
+
+    .stroke {
+      font-weight: bold;
+      text-shadow:
+        -1px -1px 0 black,
+        1px -1px 0 black,
+        -1px 1px 0 black,
+        1px 1px 0 black;
+    }
+
+    .conductor-title {
+      text-decoration: underline;
+      color: goldenrod;
+    }
+
     .conductor {
       font-size: 2em;
       font-weight: bold;
       color: limegreen;
     }
+
+    .runner-up-title {
+      text-decoration: underline;
+      color: darkblue;
+    }
+
     .runner-up {
       font-size: 1.2em;
       color: white;
     }
+
     .name-list li {
       color: orange;
     }
+
     .countdown {
       position: absolute;
       top: 20px;
@@ -32,6 +55,7 @@
       color: orange;
       font-weight: bold;
     }
+
     ul {
       columns: 2;
       margin-top: 20px;
@@ -39,15 +63,20 @@
   </style>
 </head>
 <body>
-  <div class="countdown" id="countdown">Next draw in: --:--:--</div>
-  <h1>Today's Train Conductor</h1>
-  <div class="conductor" id="winner">Loading...</div>
-  <h2>Runners-Up</h2>
+  <div class="countdown stroke" id="countdown">Next draw in: --:--:--</div>
+  <h1 class="stroke conductor-title" id="today-heading">Today's Train Conductor</h1>
+  <div class="stroke conductor" id="winner">Loading...</div>
+  <h2 class="stroke runner-up-title">Runners-Up</h2>
   <ul id="runners-up"></ul>
-  <h2>All Names</h2>
+  <h2 class="stroke">All Names</h2>
   <ul id="name-list" class="name-list"></ul>
 
   <script>
+    // Format and display today's date in the heading
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('today-heading').textContent += " - " + today.toLocaleDateString(undefined, options);
+
     async function fetchData() {
       const [namesRes, winnerRes] = await Promise.all([
         fetch('/names'),
@@ -60,7 +89,7 @@
       const runnerList = document.getElementById('runners-up');
       result.runnersUp.forEach((name, index) => {
         const li = document.createElement('li');
-        li.className = 'runner-up';
+        li.className = 'stroke runner-up';
         li.textContent = `${index + 2}. ${name}`;
         runnerList.appendChild(li);
       });
@@ -68,6 +97,7 @@
       const nameList = document.getElementById('name-list');
       names.forEach(name => {
         const li = document.createElement('li');
+        li.className = 'stroke';
         li.textContent = name;
         nameList.appendChild(li);
       });
