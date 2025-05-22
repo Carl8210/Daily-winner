@@ -20,12 +20,30 @@
         -1px 1px 0 black,
         1px 1px 0 black;
     }
-    .conductor-title { text-decoration: underline; color: goldenrod; }
-    .conductor { font-size: 2em; color: limegreen; }
-    .runner-up-title { text-decoration: underline; color: red; }
-    .runner-up { font-size: 1.2em; color: white; }
-    .name-list li { color: orange; }
-    .member-title { color: red; }
+    .conductor-title {
+      text-decoration: underline;
+      color: goldenrod;
+    }
+    .conductor {
+      font-size: 2em;
+      color: limegreen;
+    }
+    .runner-up-title {
+      text-decoration: underline;
+      color: red;
+    }
+    .runner-up {
+      font-size: 1.2em;
+      color: white;
+    }
+    .name-list li {
+      color: orange;
+    }
+    .member-title {
+      color: red;
+      text-align: center;
+      text-decoration: underline;
+    }
     .countdown {
       position: absolute;
       top: 20px;
@@ -33,18 +51,9 @@
       color: orange;
       font-weight: bold;
     }
-    ul { columns: 2; margin-top: 20px; }
-
-    #editor {
-      display: none;
+    ul {
+      columns: 2;
       margin-top: 20px;
-      background: rgba(255,255,255,0.9);
-      padding: 10px;
-      border-radius: 10px;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
     }
   </style>
 </head>
@@ -57,16 +66,22 @@
   <h2 class="stroke member-title">Current Members</h2>
   <ul id="name-list" class="name-list"></ul>
 
-  <button onclick="showEditor()">Edit Members</button>
-
-  <div id="editor">
-    <p>Enter password: <input type="password" id="edit-pass" /></p>
-    <textarea id="edit-names"></textarea><br>
-    <button onclick="saveNames()">Save</button>
-  </div>
-
   <script>
-    document.getElementById('today-heading').textContent += " - " + new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    function getBerlinDrawDate() {
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const berlinOffset = 2 * 60; // CEST = UTC+2
+      const berlin = new Date(utc + berlinOffset * 60000);
+
+      // if before 06:00 Berlin time, use yesterday's date
+      if (berlin.getHours() < 6) {
+        berlin.setDate(berlin.getDate() - 1);
+      }
+
+      return berlin.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    document.getElementById('today-heading').textContent += " - " + getBerlinDrawDate();
 
     async function fetchData() {
       const [namesRes, winnerRes] = await Promise.all([
@@ -92,8 +107,6 @@
         li.textContent = name;
         nameList.appendChild(li);
       });
-
-      document.getElementById('edit-names').value = names.join("\\n");
     }
 
     function updateCountdown() {
@@ -106,27 +119,6 @@
       const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
       const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
       document.getElementById('countdown').textContent = `Next draw in: ${h}:${m}:${s}`;
-    }
-
-    function showEditor() {
-      document.getElementById('editor').style.display = 'block';
-    }
-
-    async function saveNames() {
-      const pass = document.getElementById('edit-pass').value;
-      const raw = document.getElementById('edit-names').value;
-      const names = raw.split('\\n').map(x => x.trim()).filter(Boolean);
-      const res = await fetch('/edit-names', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass, names })
-      });
-      if (res.ok) {
-        alert('Name list updated!');
-        location.reload();
-      } else {
-        alert('Incorrect password or error saving names.');
-      }
     }
 
     fetchData();
